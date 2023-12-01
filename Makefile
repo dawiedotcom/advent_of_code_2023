@@ -4,7 +4,7 @@ PROG=$(patsubst %.cpp, %, $(SRC))
 all : $(PROG)
 
 .PHONY: run
-run:
+run: aoc
 	./aoc < input
 
 .PHONY: clean
