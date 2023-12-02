@@ -93,7 +93,7 @@ int main() {
   while (getline(cin, line)) {
     sum += process(line);
   }
-  cout << "Answer: " << sum << endl;
+  cout << sum << endl;
 
   return 0;
 }

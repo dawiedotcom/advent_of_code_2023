@@ -12,34 +12,38 @@ string parse_to_token(const string& line, size_t& pos, const string& token) {
   return result;
 }
 
-size_t parse_next_int(const string& line, size_t& pos) {
-  while (pos < line.size() && !isdigit(line[pos])) pos++;
+string parse_next(const string& line, size_t& pos, int (*predicate) (int) ) {
+  while (pos < line.size() && !predicate(line[pos])) pos++;
   size_t len = 0;
-  while (pos + len < line.size() && isdigit(line[pos + len])) len++;
-  if (!isdigit(line[pos+len-1])) {
+  while (pos + len < line.size() && predicate(line[pos + len])) len++;
+  if (!predicate(line[pos+len-1])) {
     pos = line.size()-1;
-    return 0;
+    return "";
   }
   //cout << line.substr(pos, len) << endl;
-  size_t result = stoi(line.substr(pos, len));
-  pos ++;
+  string result = line.substr(pos, len);
+  pos += len;
   return result;
 }
 
+size_t parse_next_int(const string& line, size_t& pos) {
+  string s = parse_next(line, pos, isdigit);
+  return s.size() > 0 ? stoi(s) : 0;
+}
+
+string parse_next_word(const string& line, size_t& pos) {
+  return parse_next(line, pos, isalpha);
+}
+
 size_t parse_game(const string& line, size_t& pos) {
-  auto game_phrase = parse_to_token(line, pos, ":");
-  size_t tmp=0;
-  return parse_next_int(game_phrase, tmp);
+  parse_to_token(line, pos, "Game ");
+  return parse_next_int(line, pos);
 }
 
 size_t parse_cube(const string& line, size_t& pos, string& color) {
-  string s = parse_to_token(line, pos, ",");
-  size_t tmp=0;
-  size_t result = parse_next_int(s, tmp);
-  if (s.find("blue") != string::npos) color = "blue";
-  if (s.find("green") != string::npos) color = "green";
-  if (s.find("red") != string::npos) color = "red";
-
+  size_t result = parse_next_int(line, pos);
+  color = parse_next_word(line, pos);
+  parse_to_token(line, pos, ",");
   return result;
 }
 
@@ -93,7 +97,7 @@ int main() {
   while (getline(cin, line)) {
     sum += process(line);
   }
-  cout << "Answer: " << sum << endl;
+  cout << sum << endl;
 
   return 0;
 }
