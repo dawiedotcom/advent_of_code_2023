@@ -1,12 +1,9 @@
 SRC=$(wildcard *.cpp)
 PROG=$(patsubst %.cpp, %, $(SRC))
-CPPFLAGS=-Ilib/
+CPPFLAGS=-std=c++23 -Ilib/
 
 LIB=$(wildcard lib/*.cpp)
 LIB_OBJ=$(patsubst %.cpp, %.o, $(LIB))
-
-$(info $(LIB))
-$(info $(LIB_OBJ))
 
 all : $(PROG) test
 
@@ -14,7 +11,6 @@ all : $(PROG) test
 	g++ -MD $(CPPFLAGS) -c $< -o $@
 
 $(PROG) : % : %.o $(LIB_OBJ)
-	@echo 'HI'
 	g++ $< $(LIB_OBJ) -o $@
 
 lib/%.o : lib/%.cpp
@@ -26,9 +22,7 @@ run: aoc
 
 .PHONY: clean
 clean:
-	rm $(SRC:%.cpp=%.d)
-	rm $(PROG)
-	rm $(LIB_OBJ)
+	rm *.d *.o lib/*.o lib/*.d $(PROG)
 
 .PHONY: test
 test: $(PROG)

@@ -6,6 +6,10 @@ function test() {
     ANS=$3
 
     GOT=$(./"$PROG" < "$INPUT" | tail -n 1)
+    if [ $? -ne 0 ]; then
+        echo -e "[\033[91mFAIL\033[0m] '$PROG < $INPUT | tail -n 1' non zero exit code"
+        exit
+    fi
     if [ $GOT -ne $ANS ]; then
         echo -e "[\033[91mFAIL\033[0m] '$PROG < $INPUT | tail -n 1' != $ANS. Got $GOT"
     else
@@ -17,3 +21,6 @@ test d2p1 d2_test 8
 test d2p1 d2_input 2810
 test d2p2 d2_test 2286
 test d2p2 d2_input 69110
+test d3p1 d3_test 4361
+test d3p1 d3_input 540131
+test d3p2 d3_test 467835
