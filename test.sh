@@ -24,3 +24,7 @@ test d2p2 d2_input 69110
 test d3p1 d3_test 4361
 test d3p1 d3_input 540131
 test d3p2 d3_test 467835
+test d4p1 d4_test 13
+test d4p1 d4_input 24542
+test d4p2 d4_test 30
+test d4p2 d4_input 8736438
