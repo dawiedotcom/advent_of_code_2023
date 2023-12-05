@@ -21,7 +21,7 @@ void init_test(const char * name) {
 
 int report() {
 
-  printf("[TEST] \033[ 1;33m%s\033[0m: ", test_data.name);
+  printf("[\033[ 1;33mTEST\033[0m] \033[1;37m%s\033[0m: ", test_data.name);
   //if (test_data.sig > 0) {
   //  printf("\033[91mUnexpected termination\033[0m.\n");
   //}

@@ -5,4 +5,5 @@
 part[1-2]
 input
 input.ans.[1-2]
-test/test_[A-Za-z]
+test/test_*
+!test/test_*.cpp

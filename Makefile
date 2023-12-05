@@ -16,24 +16,36 @@ PROG+=$(TEST_PROG)
 all : $(PROG) .test .run
 
 %.o : %.cpp
-	g++ -MD $(CPPFLAGS) -c $< -o $@
+	@echo -e "[\033[1;36mCPP\033[0m]\t$<"
+	@g++ -MD $(CPPFLAGS) -c $< -o $@
 
 $(PROG) : % : %.o $(LIB_OBJ)
-	g++ -MD $< $(LIB_OBJ) -o $@
+	@echo -e "[\033[1;34mLD\033[0m]\t$<"
+	@g++ -MD $< $(LIB_OBJ) -o $@
 
 lib/%.o : lib/%.cpp
-	g++ -MD -c $< -o $@
+	@echo -e "[\033[1;36mCPP\033[0m]\t$<"
+	@g++ -MD -c $< -o $@
 
 # run.sh is excetuted with out of date targets ($?) of .run
 .run: $(PROG)
 	@./run.sh $?
 	@touch $@
 
-
-.PHONY: clean
+.PHONY: run test clean
 clean:
 	@echo "[CLEAN]"
-	@rm .run .test $(SRC:%.cpp=%.d) $(SRC:%.cpp=%.o) lib/*.o lib/*.d $(PROG)
+	@rm -f .run .test
+	@rm -f $(TEST_SRC:%.cpp=%.d) $(TEST_SRC:%.cpp=%.o)
+	@rm -f $(SRC:%.cpp=%.d) $(SRC:%.cpp=%.o) lib/*.o lib/*.d $(PROG)
+
+run:
+	@./run.sh $(PROG)
+
+test:
+	@for test in $(TEST_PROG) ; do \
+		$${test} ; \
+	done
 
 # .test is a placeholder. Unit tests are run if they have been recently compiled.
 .test: $(TEST_PROG)

@@ -24,7 +24,7 @@ int main() {
     sum += 10 * char_to_int(first_digit) + char_to_int(last_digit);
     cout << first_digit << last_digit << endl;
   }
-  cout << "The sum is: " << sum << endl;
+  cout << sum << endl;
 
   return 0;
 }
