@@ -36,9 +36,15 @@ std::string parser::with(int (*predicate) (int)) {
 
 }
 
-size_t parser::next_int() {
+long long parser::next_int() {
   std::string s = with(isdigit);
-  return s.size() > 0 ? stoi(s) : 0;
+  try {
+    return s.size() > 0 ? stoll(s) : 0;
+  }
+  catch (...) {
+    std::cout << "Out of range: "  << s << std::endl;
+    return 0;
+  }
 }
 
 std::string parser::next_word() {

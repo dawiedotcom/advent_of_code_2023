@@ -14,7 +14,7 @@ public:
 
   std::string to_token(const std::string& token);
   std::string with(int (*pridicate) (int));
-  size_t next_int();
+  long long next_int();
   std::string next_word();
 
   char top() { return done() ? ' ' : line[ position];}
