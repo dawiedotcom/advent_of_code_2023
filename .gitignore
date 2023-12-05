@@ -2,3 +2,6 @@
 *.d
 .run
 .test
+part[1-2]
+input
+input.ans.[1-2]
