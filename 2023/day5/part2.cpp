@@ -8,129 +8,59 @@
 #include <cassert>
 
 #include "parser.h"
+#include "interval.h"
 
 using namespace std;
 
 #define NUM_MAPS 7
 #define MAX_MAP 100
 
-typedef unsigned long long ull;
-struct range {
-  ull start, length;
-};
+typedef long long ull;
 
 class lin_map {
 public:
-  unsigned long long from, to, length;
+  long long from, to, length;
+  interval domain;
 public:
-  lin_map(unsigned long long f, unsigned long long t, unsigned long long l)
+  lin_map(long long f, long long t, long long l)
     : from(f)
     , to(t)
     , length(l)
+    , domain(f, f+l)
   {
 
   }
 
-  bool contains(unsigned long long x) {
+  bool contains(long long x) {
     return (x < from + length) && (x >= from);
   }
 
-  unsigned long long operator()(unsigned long long x) {
-    return (x-from) + to;
+  long long operator()(long long x) {
+    return to + (x-from);
   }
 
-  void on_range(vector<range>& unmapped, vector<range>& mapped) {//}, range r) {
-    auto r = unmapped[unmapped.size()-1];
+  // assums i is in domain
+  interval apply_on_interval(interval i) {
+    return interval(operator()(i.start), operator()(i.end));
+  }
 
-    ull end = from + length - 1;
-    ull r_end = r.start + r.length - 1;
-    ull start = from;
+  void apply_on_intervals(const vector<interval>& intervals, vector<interval>& range, vector<interval>& still_to_map) {
+    for (auto& i: intervals) {
 
-    unmapped.erase(unmapped.end()-1);
-
-    if ((r.start > end) || (r_end < start)) {
-      // range above or below the mapping
-      //result.push_back({
-      //    .start = r.start,
-      //    .length = r.length
-      //  });
-      mapped.push_back(r);
-      return;
-    }
-
-    if ((r.start >= start) && (r_end <= end)) {
-      // entire range in mapping
-      mapped.push_back({
-          .start = operator()(r.start),
-          .length = r.length
-        });
-      //mapped.push_back(r);
-      return;
-    }
-
-
-    if ((r.start < start) && (r_end >= start)) {
-      // top of range overlaps with the map
-      ///     [       ] mapdomain
-      /// [       ] interval
-      /// [un][map]
-      unmapped.push_back({
-          .start = start,
-          .length = start - r.start
-        });
-      mapped.push_back({
-          .start = operator()(start),
-          .length = (r_end+1) - start
-        });
-      if (r.length != mapped[mapped.size()-1].length + unmapped[unmapped.size()-1].length) {
-        cout << "r.length: " << r.length << endl;
-        cout << "unmapped.length: " << unmapped[unmapped.size()-1].length << endl;
-        cout << "mapped.length: " << mapped[mapped.size()-1].length << endl;
-        assert(r.length == mapped[mapped.size()-1].length + unmapped[unmapped.size()-1].length);
+      if (i.extends_past_left(domain)) {
+        interval left = i.left_of(domain);
+        still_to_map.push_back(left);
       }
-      return;
-    }
-
-    if ((r.start <= end) && (r_end > end)) {
-      // bottom of range overlaps with the map
-      ///  [       ] mapdomain
-      ///      [       ] interval
-      ///      [map][un]
-      mapped.push_back({
-          .start = operator()(r.start),
-          .length = (end+1) - r.start
-        });
-      unmapped.push_back({
-          .start = (end+1),
-          .length = (r.start + r.length) - (end+1)
-        });
-
-      if (r.length != mapped[mapped.size()-1].length + unmapped[unmapped.size()-1].length) {
-        cout << "r.length: " << r.length << endl;
-        cout << "unmapped.length: " << unmapped[unmapped.size()-1].length << endl;
-        cout << "mapped.length: " << mapped[mapped.size()-1].length << endl;
-        assert(r.length == mapped[mapped.size()-1].length + unmapped[unmapped.size()-1].length);
+      if (i.intersects(domain)) {
+        interval overlap  = i.intersection(domain);
+        range.push_back(apply_on_interval(overlap));
       }
-      return;
+      if (i.extends_past_right(domain)) {
+        interval right = i.right_of(domain);
+        still_to_map.push_back(right);
+      }
+      cout << "} ";
     }
-
-    if ((r.start < start) && (r_end > end)) {
-      // range overlaps with the map on both ends
-      unmapped.push_back({
-          .start = r.start,
-          .length = start - r.start
-        });
-      mapped.push_back({
-          .start = operator()(start),
-          .length = length
-        });
-      unmapped.push_back({
-          .start = (end+1),
-          .length = (r.start + r.length) - (end+1)
-        });
-      return;
-    }
-
   }
 };
 
@@ -140,18 +70,18 @@ private:
 public:
   lin_maps() {}
 
-  void add_map(unsigned long long f, unsigned long long t, unsigned long long l) {
+  void add_map(long long f, long long t, long long l) {
     maps.push_back(lin_map(f, t, l));
   }
 
-  bool contains(unsigned long long x) {
+  bool contains(long long x) {
     for (auto& map: maps)
       if (map.contains(x))
         return true;
     return false;
   }
 
-  unsigned long long operator()(unsigned long long x) {
+  long long operator()(long long x) {
     for (auto& map: maps)
       if (map.contains(x))
         return map(x);
@@ -159,44 +89,36 @@ public:
     return x;
   }
 
-  void on_ranges(vector<range>* inp, vector<range>* result_) {
-    vector<range> i_buffer(inp->begin(), inp->end());
-    vector<range> r_buffer;
-    vector<range>* input = &i_buffer, *tmp, *result=&r_buffer;
+  void apply_on_intervals(const vector<interval>& input, vector<interval>& result) {
+    vector<interval> b1(input.begin(), input.end()), b2;
+    vector<interval> *domain=&b1, *tmp, *rem_domain=&b2;
 
-    //for (auto& map : maps) {
-    for (size_t i=0; i<maps.size(); i++) {
-      auto& map = maps[i];
+    for (auto& map : maps) {
       cout << "Map " << map.from << "-" << map.from+map.length - 1 << " -> " << map.to << "-" << map.to+map.length - 1 << endl;
-      result->clear();
-      //for (auto& r : *input) {
-      while (input->size() > 0) {
-        auto old_size = result->size();
-        auto r = input->at(input->size()-1);
-        map.on_range(*input, *result);
+      if (domain->empty())
+        break;
+      rem_domain->clear();
+      map.apply_on_intervals(
+        *domain,
+        result,
+        *rem_domain
+      );
 
-        //if (old_size != result->size())
-        {
-          cout << "Range " << r.start << "-" << r.start+r.length - 1; // << endl;
-          cout << " TO: ";
-          //cout << out << ") ";
-          for (auto it=old_size; it<result->size(); it++)
-            cout << result->at(it).start << "-" << result->at(it).start + result->at(it).length - 1 << " ";
-          cout << endl;
-        }
+      for (auto& i : *rem_domain)
+        cout << i << " ";
+      for (auto& i : result)
+        cout << i << " ";
+      cout << endl;
 
-      }
-      //if (map != maps[maps.size()-1]) {
-      if (i != maps.size()-1) {
-        tmp = input;
-        input = result;
-        result = tmp;
-      }
-    cout << endl;
-  }
+      tmp = domain;
+      domain = rem_domain;
+      rem_domain = tmp;
+    }
 
-  for (auto& r: *result)
-      result_->push_back(r);
+    for (auto& i : *domain)
+      result.push_back(i);
+    //for (auto& i : *range)
+    //  result.push_back(i);
   }
 };
 
@@ -205,15 +127,12 @@ private:
   size_t current_input_map;
   //array<unordered_map<size_t, size_t>, NUM_MAPS> maps;
   array<lin_maps, NUM_MAPS> maps;
-  vector<unsigned long long> seeds;
+  vector<long long> seeds;
 
 public:
   seed_locations()
     : current_input_map(NUM_MAPS)
   {
-    //for (size_t i=0; i<NUM_MAPS; i++)
-    //  for (size_t j=0; j<MAX_MAP; j++)
-    //    maps[i][j] = j;
 
   }
 
@@ -222,7 +141,6 @@ public:
 
     if (line.contains("map:")) {
       current_input_map = current_input_map == NUM_MAPS ? 0 : current_input_map+1 ;
-      //cout << "current map: " << current_input_map << endl;
       return;
     }
 
@@ -234,9 +152,9 @@ public:
       return;
     }
 
-    unsigned long long to = p.next_int();
-    unsigned long long from = p.next_int();
-    unsigned long long len = p.next_int();
+    long long to = p.next_int();
+    long long from = p.next_int();
+    long long len = p.next_int();
 
     maps[current_input_map].add_map(from, to, len);
 
@@ -252,66 +170,56 @@ public:
   }
 
   int lowest_location_nr(){
-    unsigned long long min = ULLONG_MAX;
+    long long min = LLONG_MAX;
 
-    //for (auto& seed : seeds) {
-    vector<range> v1, v2;
-    vector<range> *in = &v1, *out=&v2, *tmp;
+    vector<interval> v1, v2;
+    vector<interval> *in = &v1, *out=&v2, *tmp;
 
+    ull total_seeds = 0;
     for (int i=0; i<seeds.size(); i+=2) {
-      //unsigned long long start_seed = seeds[i];
-      //unsigned long long length = seeds[i+1];
-      //in->clear();
-      in->push_back({
-          .start = seeds[i],
-          .length = seeds[i+1]
-        });
+      in->emplace_back(seeds[i], seeds[i] + seeds[i+1]);
+      total_seeds += seeds[i+1];
     }
     for (auto &map : maps) {
+      //sort(in->begin(), in->end(), [](interval a, interval b) { return a.start < b.start; });
       cout << "IN  (";
       cout << in << "): ";
       for (auto& r: *in)
-        cout << r.start << "-" << r.start + r.length - 1<< " ";
+        cout << r << " ";
       cout << endl;
 
 
       out->clear();
-      cout << "outsize: " << out->size() << endl;
-      map.on_ranges(in, out);
+      map.apply_on_intervals(*in, *out);
 
 
+      //sort(out->begin(), out->end(), [](interval a, interval b) { return a.start < b.start; });
       cout << "OUT (";
       cout << out << ") ";
-      for (auto& r: *out)
-        cout << r.start << "-" << r.start + r.length - 1 << " ";
+      for (auto& r: *out) {
+        cout << r << " ";
+        for (auto& r2: *out) {
+          assert(!r2.intersects(r) || r2 == r);
+        }
+      }
       cout << endl;
       cout << endl;
 
       tmp = in;
       in = out;
       out = tmp;
-      //break;
     }
-    for (auto& r : *out) {
+
+    ull after_total_seeds = 0;
+    for (auto& r : *in) { // !!! output is in in due to the swap at the last iteration of the loop over maps
+      after_total_seeds += r.length();
       if (min > r.start)
         min = r.start;
     }
-    //for (auto offset=0; offset<length; offset++) {
-    //  unsigned long long seed = start_seed + offset;
-    //  for (auto& map : maps) {
-    //    //cout << seed << " ";
-    //    if (map.contains(seed))
-    //      seed = map(seed);
+    cout << "total seeds before: " << total_seeds << " after: " << after_total_seeds << endl;
+    assert(total_seeds == after_total_seeds);
 
-    //  }
-    //  if (seed < min)
-    //    min = seed;
-    //  //cout << seed << endl;;
-    //}
-
-    //cout << endl;
-
-    return min; //*min_element(seeds.begin(), seeds.end(), [](size_t a, size_t b) {return a < b;});
+    return min;
   }
 };
 
@@ -322,10 +230,10 @@ int main() {
   while (getline(cin, line)) {
     locations.parse_line(line);
   }
-  cout << "Got input" << endl;
-  //locations.show();
   cout << locations.lowest_location_nr() << endl;
 
   return 0;
 }
 // 161956620 too high
+//  46294175 just right
+//   5553076 too low
