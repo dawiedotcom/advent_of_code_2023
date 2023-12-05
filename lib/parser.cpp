@@ -12,7 +12,7 @@ std::string parser::to_token(const std::string& token) {
   auto next_token_pos = line.find(token, position);
   if (next_token_pos == std::string::npos)
     next_token_pos = line.size();
-  std::string result = line.substr(position, next_token_pos-position);
+  std::string result = line.substr(position, token.size());
   //len = next_token_pos + token.size() - position;
   len = token.size();
   position = next_token_pos + token.size();
@@ -49,4 +49,14 @@ long long parser::next_int() {
 
 std::string parser::next_word() {
   return with(isalpha);
+}
+
+void parser::show() {
+  std::cout << *this;
+}
+
+std::ostream& operator<<(std::ostream& out, parser const& p) {
+  if (!p.done())
+    out << p.line.substr(p.position);
+  return out;
 }
