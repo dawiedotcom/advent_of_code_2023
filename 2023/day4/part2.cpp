@@ -3,7 +3,7 @@
 #include <set>
 #include <vector>
 
-#include "lib/parser.h"
+#include "parser.h"
 
 using namespace std;
 
@@ -58,7 +58,7 @@ public:
     return total;
   }
 
-  
+
 };
 int main() {
   string line;

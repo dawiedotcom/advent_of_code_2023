@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "lib/engine_schematic.h"
+#include "engine_schematic.h"
 
 using namespace std;
 

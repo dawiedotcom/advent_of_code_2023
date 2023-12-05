@@ -2,7 +2,7 @@
 #include <string>
 #include <set>
 
-#include "lib/parser.h"
+#include "parser.h"
 
 using namespace std;
 
