@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cassert>
 
+using interval = interval_<unsigned int>;
+
 using namespace std;
 
 int main() {

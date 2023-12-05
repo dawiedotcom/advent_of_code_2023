@@ -9,6 +9,7 @@
 
 #include "parser.h"
 #include "interval.h"
+using interval = interval_<long long>;
 
 using namespace std;
 
@@ -94,7 +95,6 @@ public:
     vector<interval> *domain=&b1, *tmp, *rem_domain=&b2;
 
     for (auto& map : maps) {
-      cout << "Map " << map.from << "-" << map.from+map.length - 1 << " -> " << map.to << "-" << map.to+map.length - 1 << endl;
       if (domain->empty())
         break;
       rem_domain->clear();
@@ -103,12 +103,6 @@ public:
         result,
         *rem_domain
       );
-
-      for (auto& i : *rem_domain)
-        cout << i << " ";
-      for (auto& i : result)
-        cout << i << " ";
-      cout << endl;
 
       tmp = domain;
       domain = rem_domain;
@@ -181,29 +175,8 @@ public:
       total_seeds += seeds[i+1];
     }
     for (auto &map : maps) {
-      //sort(in->begin(), in->end(), [](interval a, interval b) { return a.start < b.start; });
-      cout << "IN  (";
-      cout << in << "): ";
-      for (auto& r: *in)
-        cout << r << " ";
-      cout << endl;
-
-
       out->clear();
       map.apply_on_intervals(*in, *out);
-
-
-      //sort(out->begin(), out->end(), [](interval a, interval b) { return a.start < b.start; });
-      cout << "OUT (";
-      cout << out << ") ";
-      for (auto& r: *out) {
-        cout << r << " ";
-        for (auto& r2: *out) {
-          assert(!r2.intersects(r) || r2 == r);
-        }
-      }
-      cout << endl;
-      cout << endl;
 
       tmp = in;
       in = out;
