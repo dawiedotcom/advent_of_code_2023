@@ -44,6 +44,7 @@ int main() {
       "GAME",
       "<>",
       " ",
+      "*",
       "  ",
       "\t",
     };
@@ -57,6 +58,22 @@ int main() {
     }
     TEST(p.done());
   }
+  /// Parse repeated tokens
+  {
+    parser p("hi hi");
+    p.to_token("hi ");
+    TEST(!p.done());
+    TEST(p.top() == 'h');
+  }
+  /// Parse repeated tokens
+  {
+    parser p("*6");
+    p.to_token(std::string(1, '*'));
+    TEST(!p.done());
+    TEST(p.top() == '6');
+  }
+
+
 
   return report();
 }

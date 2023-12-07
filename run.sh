@@ -18,10 +18,10 @@ function check() {
     fi
 
     ANS=$(tail -n 1 $OUTPUT_FILE)
-    if [ ! -z $(diff <(echo $ANS) <(echo $GOT))  ]; then
-        echo -e "[\033[91mFAIL\033[0m] '$PROG < $INPUT | tail -n 1' != $ANS. Got $GOT"
-    else
+    if [ -z "$(diff <(echo $ANS) <(echo $GOT))"  ]; then
         echo -e "[\033[0;32mPASS\033[0m] '$PROG < $INPUT' = \033[1;37m$ANS\033[0m"
+    else
+        echo -e "[\033[91mFAIL\033[0m] '$PROG < $INPUT | tail -n 1' != $ANS. Got $GOT"
     fi
 }
 

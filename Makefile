@@ -20,7 +20,7 @@ all : $(PROG) .test .run
 	@g++ -MD $(CPPFLAGS) -c $< -o $@
 
 $(PROG) : % : %.o $(LIB_OBJ)
-	@echo -e "[\033[1;34mLD\033[0m]\t$<"
+	@echo -e "[\033[1;34mLD\033[0m]\t$@"
 	@g++ -MD $< $(LIB_OBJ) -o $@
 
 lib/%.o : lib/%.cpp
