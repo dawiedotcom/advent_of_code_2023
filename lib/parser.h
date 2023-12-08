@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <functional>
 
 /*
  * Text parser for making sense of puzzle input.
@@ -23,7 +24,7 @@ public:
    * Examples:
    *
    */
-  std::string with(int (*pridicate) (int));
+  std::string with(std::function<bool(bool)> predicate); //int (*pridicate) (int));
   /*
    * Parses the next number in the string:
    * Examples:
@@ -35,6 +36,13 @@ public:
    * Parses the next collection of alphabetic characters.
    */
   std::string next_word();
+
+  /*
+   * Parses the next collection of alphabetic characters.
+   */
+  std::string next_alpha_num_word() {
+    return with([](char c) { return isalpha(c) || isdigit(c); });
+  }
 
   /*
    * Returns the character at the current position.
@@ -67,6 +75,8 @@ public:
   void step(size_t N) {
     position = std::min(position + N, line.size());
   }
+
+  constexpr void reset() { position = 0;}
 private:
   std::string line;
   size_t position;

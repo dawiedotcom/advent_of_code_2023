@@ -19,7 +19,8 @@ std::string parser::to_token(const std::string& token) {
   return result;
 }
 
-std::string parser::with(int (*predicate) (int)) {
+//std::string parser::with(::) { //}int (*predicate) (int)) {
+std::string parser::with(std::function<bool(bool)> predicate){ //int (*pridicate) (int));
   if (done()) return "";
   len = 0;
 
@@ -37,7 +38,7 @@ std::string parser::with(int (*predicate) (int)) {
 }
 
 long long parser::next_int() {
-  std::string s = with(isdigit);
+  std::string s = with(::isdigit);
   try {
     return s.size() > 0 ? stoll(s) : 0;
   }
@@ -48,7 +49,7 @@ long long parser::next_int() {
 }
 
 std::string parser::next_word() {
-  return with(isalpha);
+  return with(::isalpha);
 }
 
 void parser::show() {
