@@ -20,7 +20,7 @@ std::string parser::to_token(const std::string& token) {
 }
 
 //std::string parser::with(::) { //}int (*predicate) (int)) {
-std::string parser::with(std::function<bool(bool)> predicate){ //int (*pridicate) (int));
+std::string parser::with(std::function<bool(char)> predicate){ //int (*pridicate) (int));
   if (done()) return "";
   len = 0;
 

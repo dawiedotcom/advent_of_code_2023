@@ -41,12 +41,12 @@ int main() {
   {
     std::vector<std::string> tokens = {
       "hello",
-      "GAME",
-      "<>",
-      " ",
-      "*",
-      "  ",
-      "\t",
+        "GAME",
+        "<>",
+        " ",
+        "*",
+        "  ",
+        "\t",
     };
     parser p(make_input(tokens));
     for (auto& token : tokens) {
@@ -72,6 +72,33 @@ int main() {
     TEST(!p.done());
     TEST(p.top() == '6');
   }
+  /// Parse words tokens
+  {
+    std::vector<std::string> words = {
+      "hi ",
+      "i ",
+      "aoesuato ",
+      "abc"
+    };
+    parser p(make_input(words));
+    for (auto& word : words) {
+      std::string t = p.next_word();
+      if (word[word.size() - 1] == ' ')
+        word = word.substr(0, word.size()-1);
+      TEST(t == word);
+      if (t != word) {
+        std::cout
+          << "parser at: " << p.get_position()
+          << "'" << t
+          << "' '" << word <<
+          "'" << std::endl;
+      }
+    }
+    TEST(p.done());
+
+  }
+
+
 
 
 

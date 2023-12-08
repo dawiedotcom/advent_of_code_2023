@@ -24,7 +24,7 @@ public:
    * Examples:
    *
    */
-  std::string with(std::function<bool(bool)> predicate); //int (*pridicate) (int));
+  std::string with(std::function<bool(char)> predicate); //int (*pridicate) (int));
   /*
    * Parses the next number in the string:
    * Examples:
@@ -76,7 +76,13 @@ public:
     position = std::min(position + N, line.size());
   }
 
-  constexpr void reset() { position = 0;}
+  /*
+   * Sets the position to the start of the string.
+   */
+  constexpr void reset() {
+    position = 0;
+    len = 0;
+  }
 private:
   std::string line;
   size_t position;
