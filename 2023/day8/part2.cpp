@@ -2,23 +2,22 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
 
 #include "parser.h"
+#include "number_theory.h"
 
 using namespace std;
 
 struct node_t {
   string left, right;
 
-  void parse(const string& line) {
-    //p.to_token("(");
-    //left = p.next_alpha_num_word();
-    //p.step(2);
-    //right = p.next_alpha_num_word();
-    size_t l_start = line.find("(")+1;
-    left = line.substr(l_start, 3);
-    size_t r_start = line.find(", ")+2;
-    right = line.substr(r_start, 3);
+  //void parse(const string& line) {
+  void parse(parser& p) {
+    p.to_token("(");
+    left = p.next_alpha_num_word();
+    p.to_token(", ");
+    right = p.next_alpha_num_word();
   }
 };
 
@@ -33,7 +32,7 @@ public:
   void parse(const string& line) {
     parser p(line);
 
-    nodes[line.substr(0, 3)].parse(line);
+    nodes[p.next_alpha_num_word()].parse(p);
   }
 
   bool done(const vector<string>& n) const {
@@ -42,25 +41,39 @@ public:
         return false;
     return true;
   }
+  bool cycling(const vector<size_t>& cycles) {
+    for (auto c : cycles) {
+      if (c == 0) return false;
+    }
+    cout << "Cycling" << endl;
+    return true;
+  }
+  bool all_same(const vector<size_t>& n) {
+    size_t first = n[0];
+    for (size_t i=0; i<n.size(); i++)
+      if (n[i] != n[0]) return false;
+    return true;
+  }
 
   size_t run(const string& dir) {
     parser p(dir);
     size_t steps=0;
 
     vector<string> current_nodes;
-    vector<size_t> first_z;
+    vector<size_t> first_z, cycle_length;
 
     cout << "Start: ";
     for (auto& [n, _] : nodes) {
       if (n[2] == 'A') {
         current_nodes.push_back(n);
         first_z.push_back(0);
+        cycle_length.push_back(0);
         cout << current_nodes[current_nodes.size()-1] << " ";
       }
     }
     cout << endl;
 
-    while (!done(current_nodes)) {// && steps < 100) {
+    while (!cycling(cycle_length)) {
       if (p.done())
         p.reset();
 
@@ -82,21 +95,16 @@ public:
           cout << "Cycle start: " << i << " " << current_nodes[i] << " @" << steps << endl;
         }
         else if (current_nodes[i][2] == 'Z' && first_z[i] > 0) {
+          cycle_length[i] = steps - first_z[i];
           cout << "Cycle: " << i << " " << (steps - first_z[i]) << " " << current_nodes[i] << " @" << steps << endl;
           first_z[i] = steps;
         }
       }
 
-      //cout << steps << ": ";
-      //for (auto& s: current_nodes)
-      //  cout << s << " ";
-      //cout << endl;
-
+      /// c_i * n_i + s_i = N 
     }
-
-    return steps;
+    return lcm(cycle_length);
   }
-
 };
 
 int main() {

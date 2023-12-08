@@ -95,9 +95,31 @@ int main() {
       }
     }
     TEST(p.done());
-
   }
-
+  /// Parse alpha-numeric tokens
+  {
+    std::vector<std::string> words = {
+      "11abc ",
+      "90aoue097e ",
+      "abcd ",
+      "118098"
+    };
+    parser p(make_input(words));
+    for (auto& word : words) {
+      std::string t = p.next_alpha_num_word();
+      if (word[word.size() - 1] == ' ')
+        word = word.substr(0, word.size()-1);
+      TEST(t == word);
+      if (t != word) {
+        std::cout
+          << "parser at: " << p.get_position()
+          << " got '" << t
+          << "' '" << word <<
+          "'" << std::endl;
+      }
+    }
+    TEST(p.done());
+  }
 
 
 

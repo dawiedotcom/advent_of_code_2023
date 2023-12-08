@@ -1,6 +1,6 @@
 # Recursively search for prog*.cpp files.
 YEARS=$(wildcard 20*)
-SRC:=$(foreach YEAR, $(YEARS), $(shell find $(YEAR) -name '*.cpp'))
+SRC:=$(foreach YEAR, $(YEARS), $(shell find $(YEAR) -name 'part*.cpp'))
 PROG=$(patsubst %.cpp, %, $(SRC))
 CPPFLAGS=-std=c++23 -Ilib/ -Itest/
 
