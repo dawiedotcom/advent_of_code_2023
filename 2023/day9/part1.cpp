@@ -17,9 +17,7 @@ size_t process(const string&  line) {
   size_t tail_offset = 0;
   long int result = 0;
   while (!p.done()) {
-    if (p.top() == ' ') p.step(1);
-    long int mult = (p.top() == '-') ? -1 : 1;
-    nums.push_back(mult * p.next_int());
+    nums.push_back(p.next_int());
   }
   cout << tail_offset << ": ";
   for (size_t i=0; i<nums.size(); i++)

@@ -1,5 +1,7 @@
 #include "parser.h"
 
+#include <regex>
+
 parser::parser(std::string s)
   : line(s)
   , position(0)
@@ -34,11 +36,25 @@ std::string parser::with(std::function<bool(char)> predicate){ //int (*pridicate
   //std::cout << result << std::endl;
   position += len;
   return result;
+}
 
+std::string parser::with(const std::string& s) {
+  std::regex re(s);
+  std::smatch match;
+  std::string tmp = line.substr(position);
+  if (std::regex_search(tmp, match, re)) {
+    len = match.length();
+    position += match.prefix().length() + len;
+    return match.str();
+  }
+
+  position = line.size();
+  len = 0;
+  return "";
 }
 
 long long parser::next_int() {
-  std::string s = with(::isdigit);
+  std::string s = with("(-?\\d+)");
   try {
     return s.size() > 0 ? stoll(s) : 0;
   }

@@ -25,6 +25,14 @@ public:
    *
    */
   std::string with(std::function<bool(char)> predicate); //int (*pridicate) (int));
+
+  /*
+   * Parses the next token using a regular expression.
+   * Examples:
+   *
+   */
+  std::string with(const std::string& re);
+
   /*
    * Parses the next number in the string:
    * Examples:

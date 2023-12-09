@@ -10,7 +10,7 @@ template <typename T>
 std::string make_input(const std::vector<T>& things) {
   std::stringstream strm;
   for (auto& thing : things)
-    strm << thing;
+    strm << thing << " ";
   return strm.str();
 }
 
@@ -36,21 +36,38 @@ int main() {
       i += i_step;
     }
   }
+  /// Parse negative numbers
+  {
+    std::vector<std::string> tokens = {
+      "10", "-10"
+    };
+    parser p(make_input(tokens));
+    for (auto& token : tokens) {
+      long long t = p.next_int();
+      TEST(t == stoll(token));
+      if (t != stoll(token)) {
+        std::cout << "'" << t << "' '" << token << "'" << std::endl;
+      }
+    }
+    p.step(1);
+    TEST(p.done());
+  }
 
   /// Parse some constant tokens
   {
     std::vector<std::string> tokens = {
       "hello",
-        "GAME",
-        "<>",
-        " ",
-        "*",
-        "  ",
-        "\t",
+      "GAME",
+      "<>",
+      " ",
+      "*",
+      "  ",
+      "\t",
     };
     parser p(make_input(tokens));
     for (auto& token : tokens) {
       std::string t = p.to_token(token);
+      p.step(1);
       TEST(t == token);
       if (t != token) {
         std::cout << "'" << t << "' '" << token << "'" << std::endl;
@@ -94,15 +111,16 @@ int main() {
           "'" << std::endl;
       }
     }
+    p.step(1);
     TEST(p.done());
   }
   /// Parse alpha-numeric tokens
   {
     std::vector<std::string> words = {
       "11abc ",
-      "90aoue097e ",
-      "abcd ",
-      "118098"
+        "90aoue097e ",
+        "abcd ",
+        "118098"
     };
     parser p(make_input(words));
     for (auto& word : words) {
@@ -118,11 +136,26 @@ int main() {
           "'" << std::endl;
       }
     }
+    p.step(1);
     TEST(p.done());
   }
 
-
-
+  /// Parse with regular expressions
+  {
+    std::vector<std::string> words = {
+      "hello",
+      "world",
+      "Hello",
+      "World"
+    };
+    parser p(make_input(words));
+    auto it = words.begin();
+    while (!p.done()) {
+      auto token = p.with("(\\w+)");
+      TEST(token == *it++);
+      p.step(1);
+    }
+  }
 
   return report();
 }
