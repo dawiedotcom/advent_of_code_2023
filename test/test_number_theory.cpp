@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "test.h"
+#include "lib.h"
 
 #include "number_theory.h"
 
@@ -36,6 +37,12 @@ int main() {
 
     std::vector<int> n2 = {2, 4 , 6, 10};
     TEST(lcm(n2) == 60);
+  }
+  {
+    TEST(binomial_coefficient(1, 1) == 1);
+    TEST(binomial_coefficient(2, 1) == 2);
+    TEST(binomial_coefficient(4, 2) == 6);
+    SHOW(binomial_coefficient(5, 4));
   }
 
   return report();

@@ -53,6 +53,19 @@ std::string parser::with(const std::string& s) {
   return "";
 }
 
+bool parser::match(const std::string& s) {
+  std::regex re(s);
+  std::smatch match;
+  std::string tmp = line.substr(position);
+  if (std::regex_search(tmp, match, re)) {
+    len = match.length();
+    return true;
+  }
+  len = 0;
+  return false;
+
+}
+
 long long parser::next_int() {
   std::string s = with("(-?\\d+)");
   try {

@@ -156,6 +156,28 @@ int main() {
       p.step(1);
     }
   }
+  /// test match
+  {
+    parser parse("hi bye");
+    TEST(!parse.match("^bye"));
+    TEST(parse.get_last_token_length() == 0);
+
+    TEST(!parse.match("hello"));
+    TEST(parse.get_last_token_length() == 0);
+    TEST(parse.match("hi"));
+    TEST(parse.get_last_token_length() == 2);
+    TEST(parse.match("^hi"));
+    TEST(parse.get_last_token_length() == 2);
+    TEST(parse.match("bye"));
+    TEST(parse.get_last_token_length() == 3);
+    parse.to_token("hi ");
+    TEST(!parse.match("hi"));
+    TEST(parse.get_last_token_length() == 0);
+    TEST(parse.match("bye"));
+    TEST(parse.get_last_token_length() == 3);
+    TEST(parse.match("^bye"));
+    TEST(parse.get_last_token_length() == 3);
+  }
 
   return report();
 }

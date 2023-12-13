@@ -34,6 +34,11 @@ public:
   std::string with(const std::string& re);
 
   /*
+   * Returns true if re matches any part of the string from the current position onward.
+   */
+  bool match(const std::string& re);
+
+  /*
    * Parses the next number in the string:
    * Examples:
    *

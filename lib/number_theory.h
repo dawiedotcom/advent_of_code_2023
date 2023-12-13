@@ -2,6 +2,7 @@
 
 #include <numeric>
 #include <vector>
+#include <algorithm>
 
 template<typename T>
 T gcd(T a, T b) {
@@ -51,3 +52,19 @@ T lcm(const std::vector<T>& v) {
   return std::accumulate(v.begin(), v.end(), *v.begin(), lcm_<T>);
 }
 
+/*
+ * See https://en.wikipedia.org/wiki/Binomial_coefficient#In_programming_languages
+ */
+template <typename T>
+T binomial_coefficient(T n, T k) {
+  if (k<0 || k > n)
+    return 0;
+  if (k==0 || n==0)
+    return 1;
+  k = std::min(k, n-k);
+  T c = 1;
+  for (T i=0; i<k; i++) {
+    c = c *(n-i)/(i+1);
+  }
+  return c;
+}

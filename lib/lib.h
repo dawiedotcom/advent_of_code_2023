@@ -49,7 +49,16 @@ operator<<(std::ostream& out, cout_exprs<Args...> const& ce) {
   return out;
 }
 
-#define SHOW(...)                                                       \
-  std::cout << COUT_FILE_LINE                                           \
-  << cout_exprs(#__VA_ARGS__, std::make_tuple(__VA_ARGS__))             \
-  << std::endl
+template<typename T>
+std::ostream& operator<<(std::ostream& out, const std::vector<T>& v) {
+  out << "[";
+  for (const auto& i : v)
+    out << i << ", ";
+  out << "]";
+  return out;
+}
+
+#define SHOW(...)                                           \
+  std::cout << COUT_FILE_LINE                               \
+  << cout_exprs(#__VA_ARGS__, std::make_tuple(__VA_ARGS__)) \
+  << "\n"
