@@ -11,6 +11,8 @@
  * See:
  *   - https://adventofcode.com/2023/day/3
  *   - https://adventofcode.com/2023/day/10
+ *   - https://adventofcode.com/2023/day/14
+ *   - https://adventofcode.com/2023/day/16
  */
 template<typename cellT>
 class text_image {
