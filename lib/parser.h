@@ -46,6 +46,14 @@ public:
   long long next_int();
 
   /*
+   * Parses the next unsigned number in the string:
+   * Examples:
+   *
+   */
+  unsigned long long next_uint();
+
+
+  /*
    * Parses the next collection of alphabetic characters.
    */
   std::string next_word();

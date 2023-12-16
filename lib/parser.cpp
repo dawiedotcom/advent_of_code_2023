@@ -41,8 +41,7 @@ std::string parser::with(std::function<bool(char)> predicate){ //int (*pridicate
 std::string parser::with(const std::string& s) {
   std::regex re(s);
   std::smatch match;
-  std::string tmp = line.substr(position);
-  if (std::regex_search(tmp, match, re)) {
+  if (std::regex_search(line.cbegin()+position, line.cend(), match, re)) {
     len = match.length();
     position += match.prefix().length() + len;
     return match.str();
@@ -76,6 +75,18 @@ long long parser::next_int() {
     return 0;
   }
 }
+
+unsigned long long parser::next_uint() {
+  std::string s = with(::isdigit);
+  try {
+    return s.size() > 0 ? stoll(s) : 0;
+  }
+  catch (...) {
+    std::cout << "Out of range: "  << s << std::endl;
+    return 0;
+  }
+}
+
 
 std::string parser::next_word() {
   return with(::isalpha);

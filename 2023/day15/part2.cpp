@@ -69,13 +69,14 @@ struct hashmap_t {
     boxes[box_nr].remove(label);
   }
 
-  void input(const string& line) {
-    parser parse(line);
+  void input(parser& parse) {
+    //parser parse(line);
 
-    string label = parse.with(R"([A-Za-z]+)");
+    //string label = parse.with(R"([A-Za-z]+)");
+    string label = parse.next_word();
     
     if (parse.top() == '=') {
-      float fl = parse.next_int();
+      float fl = parse.next_uint();
       place_in_box(label, fl);
     }
     else if (parse.top() == '-') {
@@ -118,9 +119,9 @@ int main() {
   while (getline(cin, line)) {
     parser parse(line);
     while (!parse.done()) {
-      string step = parse.with(R"([A-Za-z0-9=-]+)");
+      //string step = parse.with(R"([A-Za-z0-9=-]+)");
 
-      hashmap.input(step);
+      hashmap.input(parse);
 
       if (parse.top() == ',')
         parse.to_token(",");

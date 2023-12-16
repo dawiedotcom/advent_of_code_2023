@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <tuple>
+#include <vector>
 
 #define COUT_FILE_LINE                                            \
   "\033[0;37m[" << __FILE__ << ":" << __LINE__ << "]: \033[0m"
@@ -49,11 +50,15 @@ operator<<(std::ostream& out, cout_exprs<Args...> const& ce) {
   return out;
 }
 
+/* Overload << for std::vector */
 template<typename T>
 std::ostream& operator<<(std::ostream& out, const std::vector<T>& v) {
   out << "[";
-  for (const auto& i : v)
-    out << i << ", ";
+  for (auto it=v.begin(); it!=v.end(); it++) {
+    out << (*it);
+    if (v.size() > 1 && it != v.end() - 1)
+      out << ", ";
+  }
   out << "]";
   return out;
 }

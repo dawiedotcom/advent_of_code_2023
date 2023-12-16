@@ -25,7 +25,7 @@ $(PROG) : % : %.o $(LIB_OBJ)
 
 lib/%.o : lib/%.cpp
 	@echo -e "[\033[1;36mCPP\033[0m]\t$<"
-	@g++ -MD -c $< -o $@
+	@g++ -MD $(CPPFLAGS) -c $< -o $@
 
 # run.sh is excetuted with out of date targets ($?) of .run
 .run: $(PROG)

@@ -5,6 +5,7 @@
 
 #include "test.h"
 #include "parser.h"
+#include "lib.h"
 
 template <typename T>
 std::string make_input(const std::vector<T>& things) {
@@ -15,8 +16,32 @@ std::string make_input(const std::vector<T>& things) {
 }
 
 int main() {
+ 
   init_test("parser");
+  /// Test match fails
+  {
+    parser p1("hello");
+    TEST(p1.next_int() == 0);
 
+  }
+  // ???
+  {
+    parser parse("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green");
+    parse.to_token("Game");
+    TEST(parse.next_int() == 1);
+    parse.to_token(":");
+    TEST(parse.next_int() == 3);
+  }
+  /// Mixed regex
+  {
+    parser parse("hello ,100 world; 200");
+    TEST(parse.next_word() == "hello");
+    parse.to_token(",");
+    TEST(parse.next_int() == 100);
+    TEST(parse.next_word() == "world");
+    parse.to_token(";");
+    TEST(parse.next_int() == 200);
+  }
   /// Test sizable number of integers
   {
     const size_t i_max = UINT_MAX/1000;
@@ -177,6 +202,26 @@ int main() {
     TEST(parse.get_last_token_length() == 3);
     TEST(parse.match("^bye"));
     TEST(parse.get_last_token_length() == 3);
+  }
+  /// Mixed regex
+  {
+    parser parse("hello 100 world 200");
+    TEST(parse.with(R"([a-z]+)") == "hello");
+    TEST(parse.next_int() == 100);
+    TEST(parse.with(R"([a-z]+)") == "world");
+    TEST(parse.next_int() == 200);
+  }
+  /// regex to vector
+  {
+    parser parse("10 100 20 200");
+    std::vector<int> is;
+    while (!parse.done()) {
+      is.push_back(parse.next_int());
+    }
+    TEST(is[0] == 10);
+    TEST(is[1] == 100);
+    TEST(is[2] == 20);
+    TEST(is[3] == 200);
   }
 
   return report();
