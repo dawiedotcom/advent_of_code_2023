@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <utility>
 #include <cassert>
 
 /*
@@ -10,11 +11,19 @@
  * makes the rest of the code a bit cleaner.
  *
  * For 2023, Day 5 Part 2
+ * See:
+ *   - 2023, Day 19 Part 2
  */
 template<typename T>
 class interval_ {
 public:
   T start, end;
+  interval_()
+    : start(0)
+    , end(0)
+  {
+    //assert(false);
+  }
   /*
    * Constructs an interval inclusive of a and exclusive of b [a, b).
    */
@@ -55,6 +64,17 @@ public:
    * elements in other;
    */
   bool extends_past_right(const interval_<T>& other) const;
+
+  /* Returns [a, pivot) [pivot, end) */
+  std::pair<interval_<T>, interval_<T>> split(T pivot) {
+    assert( (start < pivot && pivot < end) );
+    return std::make_pair(interval_<T>(start, pivot), interval_<T>(pivot, end));
+  }
+
+  /* Returns true if val is an element of this interval */
+  bool is_element(T val) {
+    return (val >= start) && (val < end);
+  }
 
   /*
    * Returns true if there exists elements in this that are larger than all elements in other.
