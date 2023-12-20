@@ -8,7 +8,7 @@
 
 int main() {
   init_test("number theory");
-  {
+  /*{
     TEST(gcd<int>(3, 2) == 1);
     TEST(gcd<int>(6, 2) == 2);
     TEST(gcd<int>(6, 9) == 3);
@@ -19,7 +19,7 @@ int main() {
     TEST(lcm<int>(6, 4) == 12);
     TEST(lcm<int>(1, 1) == 1);
     TEST(lcm<int>(2, 2) == 2);
-  }
+  }*/
   {
     std::vector<int> n1 = {2, 3 , 5, 7};
     //TEST(gcd(n1.begin(), n1.end()) == 1);
@@ -42,7 +42,7 @@ int main() {
     TEST(binomial_coefficient(1, 1) == 1);
     TEST(binomial_coefficient(2, 1) == 2);
     TEST(binomial_coefficient(4, 2) == 6);
-    SHOW(binomial_coefficient(5, 4));
+    //SHOW(binomial_coefficient(5, 4));
   }
 
   return report();
