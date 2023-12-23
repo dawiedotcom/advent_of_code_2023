@@ -73,6 +73,10 @@ public:
     return entries[to_index(x, y)];
   }
 
+  constexpr bool in_bounds(const int x, const int y) const {
+    return (x >= 0) && (y >= 0) && (x < X()) && (y < Y());
+  }
+
 private:
   size_t x, y;
   std::vector<cellT> entries;
