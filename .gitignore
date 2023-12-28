@@ -7,3 +7,4 @@ input
 input.ans.[1-2]
 test/test_*
 !test/test_*.cpp
+.ccls-cache/
