@@ -1,8 +1,7 @@
 #pragma once
 
-#include <queue>
-#include <map>
-#include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include <stack>
 #include <cassert>
 #include <algorithm>
@@ -12,14 +11,38 @@
 
 using namespace std;
 
+/*
+ * Hashable struct that represents a node in the graph. This can be
+ * used with unordered_set, and gives about 50% speedup over set<tuple<int, int>>.
+ */
+struct node_t {
+  int x, y;
+
+};
+
+constexpr bool operator==(const node_t& lhs, const node_t& rhs) noexcept {
+  return lhs.x==rhs.x && lhs.y==rhs.y;
+}
+
+template<>
+struct std::hash<node_t> {
+  size_t operator()(const node_t& n) const noexcept {
+    return (n.x + 103) * (n.y + 101);
+  }
+};
+
 class map_t {
 public:
   text_image<char> grid;
-  set<pair<int, int>> junctions;
-  map<pair<int, int>, vector<tuple<int, int, int>>> graph; 
+  unordered_set<node_t> junctions;
+  unordered_map<node_t, vector<pair<node_t, int>>> graph; 
+  unordered_set<node_t> seen;
+  node_t end;
 
   map_t()
-  {}
+  {
+    seen.reserve(50);
+  }
 
   void input(const string& line) {
     for (auto c: line) {
@@ -57,7 +80,7 @@ public:
   }
 
   constexpr void add_node(int x, int y) {
-    graph.emplace(make_pair(x, y), vector<tuple<int, int, int>>{});
+    graph.emplace(node_t{x, y}, vector<pair<node_t, int>>{});
   }
 
 
@@ -71,41 +94,45 @@ public:
 
   /* DFS to build a graph with junctions as nodes */
   void build_graph() {
-    stack<tuple<int, int, int>> s;
-    set<pair<int, int>> seen;
+    end.x = grid.X()-2;
+    end.y = grid.Y()-1;
+    stack<pair<node_t, int>> s;
+    unordered_set<node_t> seen;
     for (size_t x=0; x<grid.X(); x++)
       for (size_t y=0; y<grid.Y(); y++)
         if (is_node(x, y))
           add_node(x, y);
     //show_graph();
 
-    for (auto [point, _] : graph) {
-      auto [x_last_node, y_last_node] = point; 
+    for (auto [last_node, _] : graph) {
+      //auto [x_last_node, y_last_node] = point; 
 
-      s.push({x_last_node, y_last_node, 0});
+      s.push({last_node, 0});
       seen.clear();
-      seen.emplace(x_last_node, y_last_node);
+      seen.insert(last_node);
 
       while (!s.empty()) {
-        auto [x, y, dist] = s.top();
+        auto [node, dist] = s.top();
         s.pop();
-        seen.emplace(x, y);
+        seen.insert(node);
 
-        if (dist > 0 && is_node(x, y)) {
-          graph[{x_last_node, y_last_node}].emplace_back(x, y, dist);
+        if (dist > 0 && is_node(node.x, node.y)) {
+          graph[last_node].emplace_back(node, dist);
           continue;
         }
        
-        seen.emplace(x, y);
+        //seen.emplace(x, y);
         for (auto [nx, ny] : vector<tuple<int, int>>{
-            {x + 1, y},
-            {x - 1, y},
-            {x, y + 1},
-            {x, y - 1},
+            {node.x + 1, node.y},
+            {node.x - 1, node.y},
+            {node.x, node.y + 1},
+            {node.x, node.y - 1},
             }) {
-          if (!grid.in_bounds(nx, ny) || !is_valid_move(x, y, nx, ny) || seen.contains({nx, ny}))
+          if (!grid.in_bounds(nx, ny) 
+              || !is_valid_move(node.x, node.y, nx, ny) 
+              || seen.contains(node_t{nx, ny}))
             continue;
-          s.emplace(nx, ny, dist+1);
+          s.emplace(node_t{nx, ny}, dist+1);
         }
       }
     }
@@ -116,11 +143,10 @@ public:
   void show_graph() {
 
     for (auto [node, adj] : graph) {
-      auto [x, y] = node;
-      cout << "(" << x << "," << y << "): ";
+      cout << "(" << node.x << "," << node.y << "): ";
       for (const auto& a : adj) {
-        auto [nx, ny, dist] = a;
-        cout << "(" << nx << "," << ny << ")[" << dist << "] ";
+        auto [next, dist] = a;
+        cout << "(" << next.x << "," << next.y << ")[" << dist << "] ";
       }
       cout << endl;
     }
@@ -141,33 +167,52 @@ public:
   }
   
   int get_longest_path() {
-    //map<tuple<int, int>, size_t> d;
-    //set<tuple<int, int>> seen;
-    stack<tuple<int, int, int, set<tuple<int, int>>>> s;
+    stack<tuple<node_t, int, unordered_set<node_t>>> s;
 
     int n_paths = 0;
     int result = 0;
-    s.emplace(1, 0, 0, set<tuple<int, int>>{});
+    s.emplace(node_t{1, 0}, 0, unordered_set<node_t>{});
 
     while (!s.empty()) {
-      auto [x, y, dist, seen] = s.top();
+      auto [node, dist, seen] = s.top();
       s.pop();
 
-      if (x == grid.X()-2 && y == grid.Y()-1) {
+      if (node == end) {
         n_paths ++;
         result = std::max(result, dist);
+        //SHOW(n_paths, result, dist, s.size());
         continue;
       }
 
-      if (!seen.contains({x, y})) {
-        seen.emplace(x, y);
-        for (auto [nx, ny, nd] : graph[{x, y}])
-          s.emplace(nx, ny, dist + nd, seen);
+      if (!seen.contains(node)) {
+        seen.insert(node);
+        for (auto [next, nd] : graph[node])
+          s.emplace(next, dist + nd, seen);
       }
 
     }
     SHOW(n_paths);
           
+    return result;
+  }
+
+  int get_longest_path_rec(node_t node = {1, 0}) {
+    if (node == end)
+      return 0;
+
+    int result = -1;
+    seen.insert(node);
+    for (auto [next, dist] : graph[node]) {
+      if (!seen.contains(next)) {
+        //SHOW(x, y, nx, ny, nd, result);
+        int n_result = get_longest_path_rec(next);
+        result = n_result >= 0 
+          ? std::max(result, n_result + dist)
+          : result;
+      }
+    }
+    seen.erase(node);
+
     return result;
   }
 };

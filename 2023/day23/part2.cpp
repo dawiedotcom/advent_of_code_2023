@@ -13,6 +13,7 @@ int main() {
   }
   map.remove_slopes();
   map.build_graph();
-  cout << map.get_longest_path() << endl;
+  //cout << map.get_longest_path() << endl;
+  cout << map.get_longest_path_rec() << endl;
   return 0;
 }
