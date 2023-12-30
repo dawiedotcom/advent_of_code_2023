@@ -11,8 +11,8 @@ int main() {
   while(getline(cin, line)) {
     map.input(line);
   }
-  map.no_slopes();
+  map.remove_slopes();
+  map.build_graph();
   cout << map.get_longest_path() << endl;
-  //cout << 0 << endl;
   return 0;
 }

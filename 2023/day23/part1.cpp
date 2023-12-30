@@ -11,6 +11,7 @@ int main() {
   while(getline(cin, line)) {
     map.input(line);
   }
+  map.build_graph();
   cout << map.get_longest_path() << endl;
   return 0;
 }
