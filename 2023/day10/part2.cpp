@@ -3,7 +3,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "lib.h"
+//#include "lib.h"
 #include "parser.h"
 #include "text_image.h"
 

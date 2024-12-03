@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstddef>
+#include <ostream>
+
 const size_t MAX_DIST = 200*200;
 
 struct pipe{

@@ -58,10 +58,10 @@ int main() {
     // Is it safe
     if (is_good(levels.begin(), levels.end())) {
       safe_count ++;
-      //SHOW("SAFE", safe_count, levels);
+      SHOW("SAFE", safe_count, levels);
     }
     else {
-      //SHOW("UNSAFE", safe_count, levels);
+      SHOW("UNSAFE", safe_count, levels);
     }
   }
   cout << safe_count << '\n';
