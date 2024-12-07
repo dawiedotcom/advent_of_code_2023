@@ -20,7 +20,7 @@ the first line of that file is compared to the last line of output to
 
 ## Lib
 
-Some useful utilities are available in [lib/].
+Some useful utilities are available in [lib/](lib/).
 
 ### lib
 
@@ -38,7 +38,7 @@ int main() {
 ```
 **Output**:
 ```
-[2024/day01/part2.cpp:41]: a=10,  b=20
+[example.cpp:5]: a=10,  b=20
 ```
 
 ### Parser

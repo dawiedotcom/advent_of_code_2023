@@ -13,6 +13,11 @@ TEST_SRC=$(wildcard test/*.cpp)
 TEST_PROG+=$(patsubst %.cpp, %, $(TEST_SRC))
 PROG+=$(TEST_PROG)
 
+# Examples
+EXAMPLE_SRC=$(wildcard examples/*.cpp)
+EXAMPLE_PROG+=$(patsubst %.cpp, %, $(EXAMPLE_SRC))
+PROG+=$(EXAMPLE_PROG)
+
 all : $(PROG) .test .run
 
 %.o : %.cpp
