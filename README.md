@@ -28,17 +28,23 @@ The `SHOW` macro will print its argumens and their values.
 
 **Example**:
 ```c++
-#include "lib.h"
+#include "show.h"
+#include <vector>
 
 int main() {
   int a=10, b=20;
   SHOW(a, b);
+  SHOW(a+b);
+  std::vector<int> v = {a, b};
+  SHOW(v);
   return 0;
 }
 ```
 **Output**:
 ```
-[example.cpp:5]: a=10,  b=20
+[examples/show.cpp:6]: a=10,  b=20
+[examples/show.cpp:7]: a+b=30
+[examples/show.cpp:9]: v=[10, 20]
 ```
 
 ### Parser
