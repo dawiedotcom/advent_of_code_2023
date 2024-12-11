@@ -48,7 +48,7 @@ struct box_t {
   size_t focus_power(size_t box_nr) const {
     size_t i=0;
     return accumulate(content.begin(), content.end(), 0,
-                      [box_nr, &i](size_t fp, const lens_t& lens) {
+                      [box_nr, &i](const size_t& fp, const lens_t& lens) {
                         return fp + lens.focus_power(box_nr, i++);
                       });
   }

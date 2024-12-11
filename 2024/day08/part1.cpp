@@ -9,21 +9,21 @@
 
 using namespace std;
 
-struct point_t {
-  const int X;
-  int x, y;
-};
+//struct point_t {
+//  const int X;
+//  int x, y;
+//};
+//
+//bool operator==(const point_t& lhs, const point_t& rhs) noexcept {
+//  return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+//}
 
-bool operator==(const point_t& lhs, const point_t& rhs) noexcept {
-  return (lhs.x == rhs.x) && (lhs.y == rhs.y);
-}
-
-template<>
-struct std::hash<point_t> {
-  std::size_t operator()(const point_t& point) const noexcept {
-    return point.y * point.X + point.x;
-  }
-};
+//template<>
+//struct std::hash<point_t> {
+//  std::size_t operator()(const point_t& point) const noexcept {
+//    return point.y * point.X + point.x;
+//  }
+//};
 
 using cell_t = char;
 using grid_t = text_image<cell_t>;
@@ -37,7 +37,7 @@ void read_input(grid_t& grid, antenna_t& antennas) {
     for (const auto c : line) {
       grid.push_back(c);
       if (c != '.')
-        antennas[c].emplace(line.size(), x, y);
+        antennas[c].emplace(x, y, line.size());
       x++;
     }
     grid.start_new_row();
@@ -67,7 +67,7 @@ int count_antinodes(const grid_t& grid, const antenna_t& antennas) {
         get_antinode(a, b, antinode);
         if (grid.in_bounds(antinode.x, antinode.y)) {
           //result ++;
-          antinode_locations.emplace(0, antinode.x, antinode.y);
+          antinode_locations.emplace(antinode.x, antinode.y, 0);
           //SHOW(antenna_label, antinode.x, antinode.y);
         }
       }

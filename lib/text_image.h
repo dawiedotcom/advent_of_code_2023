@@ -6,6 +6,7 @@
 #include <iostream>
 #include <utility>
 
+#include "point.h"
 /*
  * Class to keep track of 2D arrays of ASCII characters.
  * See:
@@ -71,6 +72,10 @@ public:
   /* Access a row and column with the [] operator */
   constexpr cellT& operator[](const size_t x, const size_t y) {
     return entries[to_index(x, y)];
+  }
+
+  constexpr cellT& operator[] (const point_t& p) {
+    return (*this)[p.x, p.y];
   }
 
   constexpr bool in_bounds(const int x, const int y) const {
